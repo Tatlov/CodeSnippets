@@ -1,0 +1,33 @@
+# Plot a day time series without associated dates
+
+```{r set_global_options, echo = FALSE}
+opts_chunk$set(echo = TRUE, tidy = FALSE)
+```
+
+The Coursera course "reproducible research" involved a problem where data 
+was in the following form:
+```{r time_data}
+time_data <- data.frame( time = c(800,815,830,845,900) , value = 2:6)
+time_data
+```
+
+The task is to plot value vs time. The date is irrelevant for this data set.
+A time format that only stores the time since the start of the day would 
+be suitable. ITime from data.table provides such a format.  
+Convert the time data to ITime:
+```{r to_iTime}
+library(data.table)
+to_ITime <- function(x){
+    x <- as.character(x)
+    n <- nchar(x)
+    as.ITime(paste0(substr(x,1,n-2),":",substr(x,n-1,n)))
+}
+time_data[,"time"] <- as.data.frame(to_ITime(time_data[,"time"]))
+class(time_data[,"time"])
+```
+
+Creating the plot:
+```{r time_data_plot}
+library(ggplot2)
+ggplot(time_data,aes(as.POSIXct(time),value))+geom_line()
+```
